@@ -1,8 +1,7 @@
-//! The Qualcomm BREW platform, as the Zeebo ran it — extracted from the
-//! [Zeebx](https://github.com/ZeebxTeam/zeebx-emu) emulator.
+//! A host-independent implementation of the Qualcomm BREW platform, as shipped on the Zeebo.
 //!
-//! This crate is the part of the emulator that knows BREW and nothing about the host: it has no
-//! CPU, no window and no sound card. What it gives you:
+//! The crate knows BREW and nothing about the host: it has no CPU, no window and no sound card.
+//! What it gives you:
 //!
 //! - [`formats`]: parsers for the `.mod` executable, the `.mif` manifest and the `.bar` resources;
 //! - [`brew::aee`] and [`brew::aee_slots`]: the interface list, the order of the methods in each
@@ -41,7 +40,7 @@
 //! # What is not here
 //!
 //! The ARM CPU, the guest memory, and the implementation of each interface (`IDisplay`,
-//! `IMedia`, GLES…) live in the emulator, because they are bound to video, audio and input.
+//! `IMedia`, GLES…) belong to the host, because they are bound to video, audio and input.
 
 pub mod brew;
 pub mod formats;
@@ -50,3 +49,8 @@ pub mod save_state;
 
 #[cfg(all(test, feature = "sql"))]
 pub(crate) mod scratch;
+
+// Compiles the code blocks of the README, so the examples there cannot rot.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;

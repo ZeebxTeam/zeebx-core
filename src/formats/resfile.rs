@@ -84,6 +84,8 @@ impl std::fmt::Display for ResError {
     }
 }
 
+impl std::error::Error for ResError {}
+
 impl ResFile {
     pub fn parse(data: Vec<u8>) -> Result<Self, ResError> {
         let magic = u16(&data, 0)?;
