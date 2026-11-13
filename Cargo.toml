@@ -1,0 +1,23 @@
+[package]
+name = "zeebx-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.93"
+license = "GPL-2.0-or-later"
+authors = ["ZeebxTeam"]
+repository = "https://github.com/ZeebxTeam/zeebx-core"
+description = "Qualcomm BREW platform core extracted from the Zeebx Zeebo emulator: .mod/.mif/.bar parsers, AEE vtable layout, guest heap, VFS and stdlib helpers"
+keywords = ["brew", "zeebo", "emulator", "qualcomm", "aee"]
+categories = ["emulators", "parser-implementations"]
+readme = "README.md"
+include = ["src/**/*.rs", "Cargo.toml", "README.md", "LICENSE"]
+
+[features]
+default = ["sql"]
+# `AEECLSID_SQLMGR` em cima de SQLite real. Opcional porque o `bundled` compila SQLite em C,
+# e quem só quer ler `.mod`/`.mif`/`.bar` não precisa pagar esse build.
+sql = ["dep:rusqlite"]
+
+[dependencies]
+crc32fast = "1"
+rusqlite = { version = "0.37", features = ["bundled"], optional = true }
