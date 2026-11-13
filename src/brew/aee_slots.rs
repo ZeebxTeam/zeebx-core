@@ -161,7 +161,7 @@ pub const BITMAP: &[&str] = &[
 ];
 
 /// Methods of the canvas `0x0101e443`. Only slot 7 is called; the others stay as placeholders so
-/// that an unexpected call shows up in the report.
+/// that an unexpected call surfaces as unimplemented.
 pub const CANVAS: &[&str] = &[
     "AddRef",
     "Release",
@@ -1008,7 +1008,7 @@ pub const WEB: &[&str] = &[
 
 /// Methods of `ISQLMgr` (`AEECLSID_SQLMGR = 0x0102c4e8`), the console's database manager.
 ///
-/// There is no header: the order came from observation with `--probe`. The Z-Wheel creates the
+/// There is no header: the order came from observing the calls. The Z-Wheel creates the
 /// object and calls slot 3 with the file name and an output pointer — `"tt_prefs.db"` and the
 /// address where it expects the database. Slots 2 and 4 onward have not shown up yet, and so they
 /// have no name.
@@ -1073,7 +1073,7 @@ pub const PEEK: &[&str] = &[
 ///
 /// Only slot 3 has a name because only it has been seen in use. The first two are the `AddRef`
 /// and `Release` of every BREW interface; slot 2 stays unnamed on purpose, so that a call to it
-/// shows up in the report instead of passing as implemented.
+/// surfaces as unimplemented instead of passing as implemented.
 pub const WIDGET: &[&str] = &[
     "AddRef",
     "Release",
@@ -1171,7 +1171,7 @@ pub const ZEEBO_MCP: &[&str] = &[
 ///
 /// Four, not twelve: the names of 2 and 3 come from the SDK's `ICONFIG_GetItem`/`ICONFIG_SetItem`,
 /// and the shape of the Z-Wheel's call matches the signature. The eight above stay unnamed so that
-/// a call to them shows up in the report — the firmware's vtable, which would have them, is the
+/// a call to them surfaces as unimplemented — the firmware's vtable, which would have them, is the
 /// one that has already turned out to be a facade.
 pub const CONFIG: &[&str] = &["AddRef", "Release", "GetItem", "SetItem"];
 
@@ -1194,7 +1194,7 @@ pub const SYSTEM_CTL: &[&str] = &[
     // `1.1.2_APPS.bin` (Thumb, `0x10e9fe92`): it receives `(this, mode, option)` — the option with
     // `-1` meaning "the device's", read from `0x114287ec` — and **ends by calling the body of
     // `DefinirModo`** (`bl 0x10e9fdb6`, slot 3). Measured: it is the call the Z-Wheel makes on
-    // **confirm** (`0xe064`), and without it the scan stopped at `Unimplemented` on the first key.
+    // **confirm** (`0xe064`), and without it the app stopped at `Unimplemented` on the first key.
     "DefinirModoComOpcao",
     "Consultar",
 ];
@@ -1254,8 +1254,7 @@ pub const TYPEFACE: &[&str] = &["AddRef", "Release", "slot2", "slot3", "CriarFon
 
 /// Methods of `IFont` — the system's bitmap font.
 ///
-/// The order is that of the reference code that already implements this interface
-/// (`zeebo-emulator/.../zeemu/brew/BrewFont.cpp`) and that of the six `#define`s in `AEEFont.h`:
+/// The order is that of the six `#define`s in `AEEFont.h`:
 ///
 /// ```text
 /// AddRef(0)  Release(1)  QueryInterface(2)  DrawText(3)  GetInfo(4)  MeasureText(5)
@@ -1296,10 +1295,10 @@ pub const VECTOR: &[&str] = &[
 
 /// Methods of the Z-Wheel's generic collection (`0x0102c4e8`… no: `0x0100104f`).
 ///
-/// No header. The names came from usage, observed with `--probe`: the app creates the collection,
+/// No header. The names came from usage, observed in the calls: the app creates the collection,
 /// calls slot 5 once and then alternates 7 and 4 until 4 says it is done — the shape of a cursor.
 /// The unnamed slots have never been called; leaving them unnamed is what makes an unexpected
-/// call show up in the report instead of passing as implemented.
+/// call surface as unimplemented instead of passing as implemented.
 pub const COLLECTION: &[&str] = &[
     "AddRef",
     "Release",
@@ -1331,8 +1330,8 @@ pub const COLLECTION: &[&str] = &[
 ///
 /// The previous order — `QueryInterface`, `Reset`, `Update`, `GetDigest` — was `IQI` plus a
 /// guess, and got everything from slot 2 onward wrong: the "QueryInterface" wrote into a field
-/// that was a size, and the "Update" read as a pointer what was not one. Both showed up in the
-/// report as core faults, and that is how the error was found.
+/// that was a size, and the "Update" read as a pointer what was not one. Both showed up as
+/// faults, and that is how the error was found.
 ///
 /// **There is no `QueryInterface`**: the first two slots are the `AddRef` and `Release` of
 /// `DECLARE_IBASE`, and its own methods start at 2.

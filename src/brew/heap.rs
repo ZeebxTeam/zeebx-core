@@ -3,7 +3,7 @@
 //! It serves BREW's `MALLOC`/`FREE`. All the bookkeeping stays on the host — no header is written
 //! into guest memory — because the game never inspects the heap's internal structure. It does,
 //! however, read past the end of what it asked for: that is why `MALLOC` asks here for one extra
-//! byte and fills it (`BLOCK_PADDING`, in Zeebx's `machine/thread.rs`).
+//! byte and fills it (the host's `BLOCK_PADDING`).
 
 use std::collections::{BTreeMap, HashMap};
 
@@ -139,7 +139,7 @@ impl Heap {
     /// single allocation (its own `Free(67001392)` becomes a `malloc` of 67001488), and the lying
     /// sum made the request be refused — `check_malloc: Malloc failed in Tectoy.c at line 570` —
     /// with the heap far from full. The game is what decides whether the device can cope, and it
-    /// decides by the number we report.
+    /// decides by the number this returns.
     pub fn largest_block(&self) -> u32 {
         let ahead = self.end.saturating_sub(self.next);
         let hole = self.free_list.values().copied().max().unwrap_or(0);
@@ -268,7 +268,7 @@ mod tests {
     /// given back.**
     ///
     /// It is what finds the stack Iron Sight allocated for itself, from `sp`: a returned block
-    /// that could still be found would make the emulator dirty memory that already belongs to
+    /// that could still be found would make the host dirty memory that already belongs to
     /// someone else.
     #[test]
     fn the_block_containing_an_address_is_found_from_its_middle() {
@@ -311,7 +311,7 @@ mod tests {
 
     /// **Merging keeps the heap from falling to pieces.**
     ///
-    /// The pattern is the one from the Treino Cerebral report: small blocks allocated and freed
+    /// The pattern is the one Treino Cerebral produces: small blocks allocated and freed
     /// between two large ones. The test **exhausts the bump pointer before measuring** — without
     /// that the space ahead hides the fragmentation, and the snapshot looks healthy precisely when
     /// it is not.

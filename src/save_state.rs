@@ -1,9 +1,7 @@
 //! The save state **format**: versioned, with named sections and an integrity check.
 //!
-//! It is kept apart from the state on purpose. The core's `retro_serialize_size` answers **zero**
-//! until the whole state is inside it — zero is how the frontend understands "this core does not
-//! save", and it is the only honest answer while some field is left out. What this module solves
-//! first is the part the goal names: **a versioned format**.
+//! It is kept apart from the state on purpose: this module defines the **container** — versioned,
+//! sectioned and checked — and each component decides what goes into its own sections.
 //!
 //! ## Why named sections
 //!
@@ -35,7 +33,7 @@
 use std::collections::BTreeMap;
 use std::ops::Range;
 
-/// File signature. Four bytes that say "this is a Zeebx save state".
+/// File signature. Four bytes that say "this is a save state in this format".
 pub const SIGNATURE: [u8; 4] = *b"ZBXS";
 
 /// Format version. It goes up when the **meaning** of the sections changes, not when a new section
@@ -69,7 +67,7 @@ impl std::fmt::Display for Error {
         match self {
             Error::Signature(bytes) => write!(
                 f,
-                "not a Zeebx save state: the first four bytes are {bytes:02x?}, \
+                "not a save state: the first four bytes are {bytes:02x?}, \
                  and should be {SIGNATURE:02x?}"
             ),
             Error::Version {

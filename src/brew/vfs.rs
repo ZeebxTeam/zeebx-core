@@ -54,7 +54,7 @@ const PREFIXES: [(&str, bool); 4] = [
 ///
 /// That is what held up the Z-Wheel's z-pad instructions form: it loads a resource from
 /// `tectoyli.brf` through that path, did not find it, and returned `EUNABLETOLOAD` — the error 6
-/// that showed up thousands of times in the report.
+/// it returned thousands of times.
 ///
 /// **Here there is only one module at a time**, so any ClassID leads to its directory. On the
 /// console a module can reach another's directory through this path; when that matters, this is
@@ -163,7 +163,7 @@ impl Vfs {
         &self.root
     }
 
-    /// State file created by the emulator for a console application.
+    /// State file created by the host for a console application.
     ///
     /// It does not go through the module's path: it is device state, so it survives a new
     /// extraction of the ZIP and never modifies the original package.

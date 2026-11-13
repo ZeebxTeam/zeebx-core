@@ -180,7 +180,7 @@ mod encoding_tests {
     }
 }
 
-/// Interfaces the emulator knows. The numeric value goes into the trampoline address.
+/// The BREW interfaces this crate knows. The numeric value goes into the trampoline address.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u32)]
 pub enum Interface {
@@ -250,7 +250,7 @@ pub enum Interface {
     /// `AEEIID_GLES11EXT`: the OpenGL ES 1.1 OES extensions. See [`aee_slots::GLES11_EXT`].
     ///
     /// Prey Evil only draws if it exists: without the interface, it builds matrices and textures
-    /// and stops — eleven GL methods in the report, no `Draw` and a black screen.
+    /// and stops — eleven GL methods called, no `Draw` and a black screen.
     Gles11Ext = 55,
     /// `AEEIID_GLES10EXT`: `QueryMatrixxOES`. See [`aee_slots::GLES10_EXT`].
     Gles10Ext = 56,
@@ -349,7 +349,7 @@ pub enum Interface {
     /// The first three slots were read: count, count, and a `QueryInterface` that compares the
     /// IID with `0x01000001` and with `0x01006c05`. The remaining five are left unnamed on
     /// purpose — the Z-Wheel, so far, only creates and releases the object, and a call to one of
-    /// them is something to show up in the report, not to be answered by guesswork.
+    /// them is something to surface as unimplemented, not to be answered by guesswork.
     ZeeboMcp = 41,
     /// `0x01001027`, BREW's `IConfig` — the device's configuration items.
     ///
@@ -378,7 +378,7 @@ pub enum Interface {
     ///
     /// Of `IPeek` we only know **slot 8**, because it is the only one the Z-Wheel calls: it passes
     /// the address of a `{pointer, size}` pair and the number 3, and expects to receive the next
-    /// line. The others stay unnamed — a call to them needs to show up in the report.
+    /// line. The others stay unnamed — a call to them needs to surface as unimplemented.
     Peek = 44,
     /// `0x01028e35`, the Z-Wheel's generic list — what the game calls a "vector model".
     ///
@@ -397,7 +397,7 @@ pub enum Interface {
     /// | 12 | set freer | `0x88458`, receiving a **function pointer from the module** |
     ///
     /// The unnamed slots were never called. Leaving them unnamed is what makes an unexpected call
-    /// show up in the report instead of passing as implemented.
+    /// surface as unimplemented instead of passing as implemented.
     Vector = 45,
     /// `0x01028e3c`: an **`IValueModel`** — a value and a list of listeners notified when it
     /// changes. It is the model that links the game grid to the action of opening the game.
@@ -420,7 +420,7 @@ pub enum Interface {
     ///
     /// Five is `SYS_OPRT_MODE_ONLINE` of Qualcomm's radio operating mode, and the field matches
     /// `oprt_mode` in `AEECMPhInfo`. That is: the question is "is the radio on the air?", and
-    /// here the answer is yes. It is a hypothesis, and it is recorded as such in the report — but
+    /// here the answer is yes. It is a hypothesis — but
     /// a hypothesis with two independent supports, the value and the position.
     Cm = 47,
     /// `0x01006c02`, the console's **system control** — the firmware's `OEM_LCTSystemCtl.c`.
@@ -446,9 +446,8 @@ pub enum Interface {
     /// table.
     ///
     /// Like [`Interface::Class28e3c`], the Z-Wheel creates and keeps it — at `+0x34b8` — and so
-    /// far calls no method at all. Here that is less surprising than it looks: the emulator
-    /// already draws text with the `tectoy.ttf` the package itself carries, so the rendering path
-    /// does not go through this object.
+    /// far calls no method at all. That is less surprising than it looks: the package itself
+    /// carries `tectoy.ttf`, so text can be drawn without going through this object.
     Typeface = 49,
     /// `IFont` — the system bitmap font, created by the `AEECLSID_FONT_*` classes.
     ///
@@ -486,12 +485,12 @@ pub enum Interface {
     /// Slot 3 receives `(this, text, applet)` and, in the firmware, stores a pair at `+0xc4` and
     /// `+0xc8`: it is a callback registration, of the "check the card and let me know" kind.
     SimCardCtl = 50,
-    /// Object of a class we do not know yet, created at the request of `--probe`.
+    /// Object of a class whose interface is not known yet, served so the host can observe it.
     ///
     /// It implements no interface at all: it exists to **find out which one it is**. Every call is
     /// logged with the slot and the arguments, and answers `SUCCESS`, so that the game goes as far
     /// as it can and shows what it expects from the object. That is how the console's `IHID` was
-    /// identified, by hand; this is the same idea with a tool.
+    /// identified.
     Probe = 35,
     /// Table of BREW stdlib functions (`MALLOC`, `STRLEN`, …), which dynamic modules access
     /// through a pointer handed over by the loader — not through an object vtable.
@@ -800,7 +799,7 @@ impl Interface {
 /// The table needs these placeholders when a slot **higher up** is known: without them, slot 28
 /// of `ICM` would have no way of sitting at index 28. But a placeholder is not an implementation,
 /// and answering it with success would be precisely the lie these tables exist to avoid. The
-/// dispatcher uses this to refuse, and then the call shows up in the report with the slot number.
+/// dispatcher uses this to refuse, and the call surfaces as unimplemented with its slot number.
 pub fn is_placeholder(name: &str) -> bool {
     name.strip_prefix("slot")
         .is_some_and(|n| n.parse::<u32>().is_ok())

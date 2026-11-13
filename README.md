@@ -9,7 +9,7 @@ A host-independent implementation of the **Qualcomm BREW** platform, as shipped 
 `zeebx-core` covers everything that is BREW and nothing that is host: file formats, the AEE
 interface tables, the guest memory layout, the heap, the virtual file system and the stdlib
 helpers. It has no CPU, no window and no audio device, which makes it a fit both for tooling that
-inspects BREW software and as the platform layer of an emulator.
+inspects BREW software and as the platform layer of a BREW runtime.
 
 ## Highlights
 
@@ -81,9 +81,9 @@ println!("{}", aee::describe(addr)); // interface and method name
 
 ```rust
 use zeebx_core::brew::heap::Heap;
-use zeebx_core::layout::{HEAP_BASE, HEAP_SIZE};
+use zeebx_core::layout::{DEFAULT_HEAP_SIZE, HEAP_BASE};
 
-let mut heap = Heap::new(HEAP_BASE, HEAP_SIZE);
+let mut heap = Heap::new(HEAP_BASE, DEFAULT_HEAP_SIZE);
 let ptr = heap.alloc(64).expect("heap has room");
 assert_eq!(heap.size_of(ptr), Some(64));
 heap.free(ptr);
@@ -121,7 +121,7 @@ cargo run --example inspect -- game.mif game.mod game.bar
 |---|---|---|
 | Module image | `0x0001_0000` | image + 1 MiB `.bss` |
 | Extension modules | `0x0800_0000` | 8 × 16 MiB |
-| Heap | `0x1000_0000` | 64 MiB |
+| Heap | `0x1000_0000` | host-defined, 64 MiB recommended (max 256 MiB) |
 | Stack | `0x2000_0000` | 1 MiB |
 | Objects | `0x3000_0000` | 4 MiB |
 | Helper table | `0x3100_0000` | 256 slots |

@@ -22,7 +22,7 @@ use rusqlite::params;
 ///
 /// The database shipped in the package is the source of the official catalog; we never modify
 /// it. The profile copy holds a tracking table of ours, so that a new scan removes only records
-/// Zeebx created, without deleting titles that came from the NAND or the package.
+/// this function created, without deleting titles that came from the NAND or the package.
 pub fn sync_z_wheel_library(
     packaged: &Path,
     profile: &Path,
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn the_integrity_check_answers_ok() {
-        // The statement that shows up in the probe before any other. A `PRAGMA` returns a row
+        // The statement the app sends before any other. A `PRAGMA` returns a row
         // like any query, and that is what the app checks.
         let dir = crate::scratch::TempDir::new("zeebx-sql-integridade");
         let db = prefs(dir.path());

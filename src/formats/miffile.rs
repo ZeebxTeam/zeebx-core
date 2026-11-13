@@ -155,7 +155,7 @@ impl MifFile {
             .collect()
     }
 
-    /// ClassID of the main applet — the one the emulator instantiates.
+    /// ClassID of the main applet — the one the host instantiates.
     pub fn main_applet(&self) -> Option<u32> {
         self.applets.first().copied()
     }
@@ -319,7 +319,7 @@ mod tests {
     /// the relationship carry the same record, with the same bytes: the game's declaring the
     /// dependency and the extension's declaring what it provides. Without "having an applet" as
     /// the criterion, the Action Hero 3D manifest would offer to serve the `0x010292c3` it is
-    /// itself asking for — and the emulator would call the game's `AEEMod_Load` again, from
+    /// itself asking for — and the host would call the game's `AEEMod_Load` again, from
     /// inside the dispatch, to create it.
     #[test]
     fn only_the_mif_without_an_applet_offers_to_provide_the_class() {

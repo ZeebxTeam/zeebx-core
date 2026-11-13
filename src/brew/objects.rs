@@ -1,4 +1,4 @@
-//! Objects the emulator exposes to the guest.
+//! Objects the host exposes to the guest.
 //!
 //! A BREW object is a pointer whose first word points to the vtable. Since our vtables are fixed
 //! per interface and live in read-only memory, each object needs only one word of guest memory
@@ -129,7 +129,7 @@ impl ObjectStore {
 
     /// How many live objects of each interface, from the most numerous to the least.
     ///
-    /// It serves the report. A game that reaches the region's ceiling is leaking references, and
+    /// It serves diagnostics. A game that reaches the region's ceiling is leaking references, and
     /// without this list that shows up as "some class stopped being created" — which is exactly
     /// how the Z-Wheel leak manifested.
     pub fn live_by_kind(&self) -> Vec<(Interface, usize)> {
@@ -149,7 +149,7 @@ impl crate::save_state::Saveable for ObjectStore {
     /// addresses and, per pointer, the interface and reference count of each live object.
     ///
     /// **Without `kinds` the save state loads objects that don't know what they are**: the
-    /// pointer comes back pointing at the right vtable in memory, and the emulator's dispatch
+    /// pointer comes back pointing at the right vtable in memory, and the host's dispatch
     /// doesn't know which interface to serve. The interface encoding is the enum discriminant,
     /// and there is a test that checks all 62 round-trip.
     fn save(&self, dest: &mut crate::save_state::Sections) {
@@ -220,7 +220,7 @@ mod tests {
     /// of each live object and the reference count.
     ///
     /// What this test guards is the difference between "the pointer came back" and "the pointer
-    /// came back **knowing what it is**". Without the interface, the emulator's dispatch doesn't
+    /// came back **knowing what it is**". Without the interface, the host's dispatch doesn't
     /// know which vtable to serve, and the game breaks on the first method it calls.
     #[test]
     fn the_object_ledger_round_trips() {

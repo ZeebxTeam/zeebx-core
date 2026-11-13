@@ -31,7 +31,7 @@
 //! println!("the game called {}", aee::describe(addr));
 //!
 //! // The guest heap hands out guest addresses; the bytes live in your memory map.
-//! let mut heap = Heap::new(layout::HEAP_BASE, layout::HEAP_SIZE);
+//! let mut heap = Heap::new(layout::HEAP_BASE, layout::DEFAULT_HEAP_SIZE);
 //! let ptr = heap.alloc(64).unwrap();
 //! assert_eq!(heap.size_of(ptr), Some(64));
 //! # let _ = slot;
