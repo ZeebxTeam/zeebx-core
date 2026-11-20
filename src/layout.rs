@@ -85,7 +85,7 @@ pub const SURFACE_SIZE: usize = 8 * 1024 * 1024;
 
 /// Memory that **the host** requests in the guest's space, outside the game's heap.
 ///
-/// `IThread` stacks, the `IPeek` line buffer, the `AEEImageInfo`, the `eglQueryString` strings
+/// `IThread` stacks, the `IGetLine` line buffer, the `AEEImageInfo`, the `eglQueryString` strings
 /// and the out pointers passed to the game's callbacks. Interleaving them with what the game
 /// requests would make the address of every game structure depend on the **host's
 /// implementation**: one extra block and everything after it shifts. Keeping them apart makes the
@@ -95,8 +95,8 @@ pub const SURFACE_SIZE: usize = 8 * 1024 * 1024;
 /// in the heap: there it is the system allocating on the game's behalf, and the size comes from
 /// the game, not from us.
 ///
-/// 16 MB because `IPeek` reserves the size of the whole font and each thread takes at least
-/// 64 KB.
+/// 16 MB because `IGetLine` reserves the size of the whole `ISource` and each thread takes at
+/// least 64 KB.
 pub const INTERNAL_BASE: u32 = 0x3400_0000;
 pub const INTERNAL_SIZE: usize = 16 * 1024 * 1024;
 
